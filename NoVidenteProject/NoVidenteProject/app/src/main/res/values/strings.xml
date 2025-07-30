@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">NoVidenteProject</string>
+    <string-array name="spinnerTipo">
+        <item>No vidente</item>
+        <item>Contacto de emergencia</item>
+    </string-array>
+
+</resources>

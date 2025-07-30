@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "1089641196998",
+    "firebase_url": "https://proyectonovidente-d1e58-default-rtdb.firebaseio.com",
+    "project_id": "proyectonovidente-d1e58",
+    "storage_bucket": "proyectonovidente-d1e58.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1089641196998:android:b92fec8902326d8c6b56c7",
+        "android_client_info": {
+          "package_name": "com.example.contactodeemergencia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsvIQlWWYEq8_Xt9i1Jg3QWhDOlu9LnmU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1089641196998:android:3e70b8389d3c27eb6b56c7",
+        "android_client_info": {
+          "package_name": "com.example.novidenteproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsvIQlWWYEq8_Xt9i1Jg3QWhDOlu9LnmU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
