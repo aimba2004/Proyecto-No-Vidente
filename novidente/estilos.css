@@ -1,0 +1,120 @@
+/* ==== ESTILO GENERAL ==== */
+* {
+  box-sizing: border-box;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(to right, #4facfe, #00f2fe);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==== LOGIN (index.html) ==== */
+.login-container {
+  background-color: #ffffffee;
+  padding: 40px 30px;
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+.login-container h2 {
+  margin-bottom: 24px;
+  color: #2c3e50;
+  font-size: 26px;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  margin-top: 14px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  border-color: #00c6ff;
+  box-shadow: 0 0 5px rgba(0, 198, 255, 0.5);
+  outline: none;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 20px;
+  background: linear-gradient(to right, #43e97b, #38f9d7);
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: linear-gradient(to right, #38f9d7, #43e97b);
+}
+
+#mensaje {
+  margin-top: 16px;
+  font-weight: bold;
+  color: #e74c3c;
+}
+
+/* ==== PANEL NO VIDENTE (novidente.html) ==== */
+.panel-container {
+  background-color: #ffffffee;
+  padding: 40px 30px;
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  width: 100%;
+  text-align: left;
+}
+
+.panel-container h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #2c3e50;
+  font-size: 26px;
+}
+
+.panel-container p {
+  margin: 10px 0;
+  font-size: 16px;
+  color: #34495e;
+}
+
+.panel-container strong {
+  color: #2c3e50;
+}
+
+#error {
+  color: #e74c3c;
+  font-weight: bold;
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* ==== RESPONSIVE PARA MÓVIL ==== */
+@media (max-width: 480px) {
+  .login-container,
+  .panel-container {
+    padding: 30px 20px;
+  }
+
+  .login-container h2,
+  .panel-container h2 {
+    font-size: 22px;
+  }
+}

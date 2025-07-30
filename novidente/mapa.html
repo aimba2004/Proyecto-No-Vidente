@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema Integrado de Seguimiento y Administración</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sistema de seguimiento en tiempo real y administración de usuarios">
+  
+  <!-- Fuentes -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <!-- Estilos mejorados -->
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary-color: #3f37c9;
+      --accent-color: #4cc9f0;
+      --danger-color: #e63946;
+      --background-light: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-dark: #2b2d42;
+      --text-light: #6c757d;
+      --success-color: #34D399;
+      --border-radius: 12px;
+      --box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --map-header-bg: rgba(255, 255, 255, 0.95);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      color: var(--text-dark);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    /* Panel lateral */
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(160deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 25px 0;
+      box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      transition: all 0.3s ease;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .sidebar-header {
+      text-align: center;
+      padding: 0 20px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar-header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 15px 0 5px;
+    }
+    
+    .sidebar-header p {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+    
+    .nav-links {
+      padding: 20px 0;
+      flex: 1;
+    }
+    
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 15px 30px;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: var(--transition);
+      position: relative;
+    }
+    
+    .nav-link i {
+      margin-right: 15px;
+      font-size: 1.2rem;
+      width: 24px;
+      text-align: center;
+    }
+    
+    .nav-link:hover, .nav-link.active {
+      color: white;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .nav-link.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: var(--accent-color);
+    }
+    
+    /* Botón de cerrar sesión */
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      padding: 15px 30px;
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.9);
+      border: none;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: var(--transition);
+      cursor: pointer;
+      margin-top: auto;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .logout-btn:hover {
+      background: rgba(230, 57, 70, 0.3);
+      color: white;
+    }
+    
+    .logout-btn i {
+      margin-right: 15px;
+      font-size: 1.2rem;
+      width: 24px;
+      text-align: center;
+    }
+    
+    /* Contenido principal */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .top-bar {
+      background-color: var(--card-bg);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      z-index: 50;
+    }
+    
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      position: relative;
+      display: inline-block;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 50px;
+      height: 4px;
+      background: var(--primary-color);
+      border-radius: 2px;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+    }
+    
+    .content-area {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+    
+    /* Estilos para la sección de mapa */
+    .map-section {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    #map-container {
+      position: relative;
+      flex: 1;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--box-shadow);
+      margin-top: 20px;
+    }
+    
+    #map {
+      height: 100%;
+      width: 100%;
+    }
+    
+    /* Header del mapa */
+    .map-header {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      z-index: 1000;
+      background-color: var(--map-header-bg);
+      padding: 15px 25px;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .map-header h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      letter-spacing: 0.5px;
+    }
+    
+    /* Botón mejorado */
+    .btn {
+      padding: 10px 20px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: var(--transition);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(67, 97, 238, 0.3);
+    }
+    
+    .btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .btn i {
+      margin-right: 10px;
+      font-size: 0.9em;
+    }
+    
+    /* Barra de estado mejorada */
+    .status-bar {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background-color: var(--map-header-bg);
+      padding: 12px 25px;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      display: none;
+      align-items: center;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .status-bar i {
+      margin-right: 10px;
+      color: var(--primary-color);
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    
+    /* Controles del mapa */
+    .map-controls {
+      position: absolute;
+      top: 90px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .map-type-btn {
+      background-color: var(--map-header-bg);
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 10px 15px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      transition: var(--transition);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .map-type-btn:hover {
+      background-color: #f1f1f1;
+      transform: translateY(-2px);
+    }
+
+    .map-type-btn i {
+      margin-right: 8px;
+    }
+    
+    /* NUEVOS ESTILOS PARA LA SECCIÓN DE USUARIOS */
+    .usuarios-section {
+      display: none;
+      height: 100%;
+    }
+    
+    .usuarios-container {
+      margin-top: 20px;
+      position: relative;
+      width: 100%;
+    }
+    
+    .usuarios-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+      margin-bottom: 30px;
+      transition: opacity 0.3s ease;
+    }
+    
+    .usuario-card {
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 25px;
+      transition: var(--transition);
+      border-left: 4px solid var(--primary-color);
+    }
+    
+    .usuario-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+    }
+    
+    .usuario-card p {
+      margin: 10px 0;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      display: flex;
+    }
+    
+    .usuario-card p strong {
+      display: inline-block;
+      width: 160px;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+    
+    .usuario-card p span {
+      flex: 1;
+      word-break: break-word;
+    }
+    
+    /* Paginación mejorada */
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+      width: 100%;
+    }
+    
+    .pagination {
+      display: flex;
+      list-style: none;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .page-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .page-link {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--card-bg);
+      border: 1px solid var(--primary-color);
+      color: var(--primary-color);
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 500;
+      text-decoration: none;
+    }
+    
+    .page-link:hover:not(.active) {
+      background-color: rgba(67, 97, 238, 0.1);
+    }
+    
+    .page-link.active {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+    
+    .page-link.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .page-link i {
+      font-size: 0.9rem;
+    }
+    
+    #error {
+      text-align: center;
+      color: #e63946;
+      font-weight: 500;
+      padding: 20px;
+      background-color: rgba(230, 57, 70, 0.1);
+      border-radius: var(--border-radius);
+      margin-top: 30px;
+      display: none;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-light);
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      grid-column: 1 / -1;
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+      opacity: 0.7;
+    }
+    
+    /* Animación de cambio de página */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+      .sidebar {
+        width: 80px;
+      }
+      
+      .sidebar-header h1, .sidebar-header p, .nav-link span, .logout-btn span {
+        display: none;
+      }
+      
+      .nav-link, .logout-btn {
+        justify-content: center;
+        padding: 15px;
+      }
+      
+      .nav-link i, .logout-btn i {
+        margin-right: 0;
+        font-size: 1.4rem;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .app-container {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 15px;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      
+      .sidebar-header {
+        display: none;
+      }
+      
+      .nav-links {
+        display: flex;
+        padding: 0;
+        flex: 1;
+      }
+      
+      .nav-link {
+        flex: 1;
+        flex-direction: column;
+        padding: 10px;
+        text-align: center;
+        font-size: 0.8rem;
+      }
+      
+      .nav-link i {
+        margin-right: 0;
+        margin-bottom: 5px;
+        font-size: 1.2rem;
+      }
+      
+      .nav-link.active::before {
+        width: 100%;
+        height: 4px;
+        top: auto;
+        bottom: 0;
+      }
+      
+      .logout-btn {
+        width: auto;
+        padding: 10px 15px;
+        border-top: none;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 0;
+      }
+      
+      .usuarios-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .page-link {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      
+      .section-title {
+        font-size: 1.3rem;
+      }
+      
+      .user-info {
+        align-self: flex-end;
+      }
+      
+      .sidebar {
+        flex-direction: column;
+      }
+      
+      .logout-btn {
+        border-left: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .page-link {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+  <!-- Google Maps JavaScript API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAu1_ei68ehNBkMjAl4jxd82p4UCVnltms" async defer></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Panel lateral -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div style="font-size: 2.5rem; color: var(--accent-color);">
+          <i class="fas fa-eye-slash"></i>
+        </div>
+        <h1>Sistema No Vidente</h1>
+        <p>Seguimiento y Administración</p>
+      </div>
+      
+      <div class="nav-links">
+        <a href="#" class="nav-link active" data-section="map-section">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Seguimiento</span>
+        </a>
+        <a href="#" class="nav-link" data-section="usuarios-section">
+          <i class="fas fa-users"></i>
+          <span>Usuarios</span>
+        </a>
+      </div>
+      
+      <button class="logout-btn" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Cerrar Sesión</span>
+      </button>
+    </div>
+    
+    <!-- Contenido principal -->
+    <div class="main-content">
+      <div class="top-bar">
+        <h2 class="section-title">Panel de Seguimiento</h2>
+        <div class="user-info">
+          <div class="user-avatar" id="user-avatar"></div>
+          <div>
+            <div id="user-name"></div>
+            <div id="user-email" style="font-size: 0.8rem; color: var(--text-light);"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Sección de mapa -->
+      <div class="content-area map-section">
+        <div id="map-container">
+          <div class="map-header">
+            <h2><i class="fas fa-location-dot"></i> Seguimiento en Tiempo Real</h2>
+            <button class="btn" id="center-map">
+              <i class="fas fa-crosshairs"></i> Centrar Mapa
+            </button>
+          </div>
+          
+          <div id="map"></div>
+          
+          <div class="map-controls">
+            <button id="satelliteBtn" class="map-type-btn">
+              <i class="fas fa-satellite"></i> Satélite
+            </button>
+            <button id="mapBtn" class="map-type-btn">
+              <i class="fas fa-map"></i> Mapa
+            </button>
+          </div>
+          
+          <div class="status-bar" id="status">
+            <i class="fas fa-sync-alt fa-spin"></i> Actualizando ubicación...
+          </div>
+        </div>
+      </div>
+      
+      <!-- Sección de usuarios -->
+      <div class="content-area usuarios-section">
+        <h2 class="section-title">Usuarios Registrados</h2>
+        
+        <div class="usuarios-container">
+          <div class="usuarios-grid" id="usuarios-grid">
+            <!-- Los usuarios se cargarán aquí dinámicamente -->
+          </div>
+          
+          <div class="pagination-container">
+            <ul class="pagination" id="pagination">
+              <!-- La paginación se generará dinámicamente -->
+            </ul>
+          </div>
+        </div>
+        
+        <p id="error"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDHLdHbKhbvSg-ET9BKgPnKqqX0IagShac",
+      authDomain: "proyectonovidente-d1e58.firebaseapp.com",
+      databaseURL: "https://proyectonovidente-d1e58-default-rtdb.firebaseio.com",
+      projectId: "proyectonovidente-d1e58",
+      storageBucket: "proyectonovidente-d1e58.appspot.com",
+      messagingSenderId: "1089641196998",
+      appId: "1:1089641196998:web:f95785dec09af8136b56c7",
+      measurementId: "G-PVFZ0EL8VQ"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const auth = firebase.auth();
+    const ubicacionRef = db.ref("ubicacion_novidente");
+    const usuariosRef = db.ref("usuarios");
+
+    // Variables globales
+    let mapa;
+    let marcador;
+    let currentLocation = null;
+    const statusBar = document.getElementById('status');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = {
+      'map-section': document.querySelector('.map-section'),
+      'usuarios-section': document.querySelector('.usuarios-section')
+    };
+    
+    // Variables para paginación
+    let usuariosCargados = false;
+    let usuariosPorPagina = 6; // Usuarios por página
+    let totalPaginas = 1;
+    let paginaActual = 1;
+    let todosUsuarios = [];
+    
+    // Función para obtener las iniciales del nombre
+    function obtenerIniciales(nombreCompleto) {
+      if (!nombreCompleto) return 'US';
+      
+      const nombres = nombreCompleto.split(' ');
+      let iniciales = '';
+      
+      if (nombres.length > 0) {
+        iniciales += nombres[0].charAt(0).toUpperCase();
+      }
+      
+      if (nombres.length > 1) {
+        iniciales += nombres[1].charAt(0).toUpperCase();
+      }
+      
+      return iniciales || 'US';
+    }
+    
+    // Función para actualizar la información del usuario
+    function actualizarInfoUsuario() {
+      const nombreUsuario = localStorage.getItem("nombreUsuario") || "Usuario";
+      const user = auth.currentUser;
+      
+      // Actualizar nombre
+      document.getElementById('user-name').textContent = nombreUsuario;
+      
+      // Actualizar correo si está disponible
+      if (user && user.email) {
+        document.getElementById('user-email').textContent = user.email;
+      } else {
+        document.getElementById('user-email').textContent = "usuario@ejemplo.com";
+      }
+      
+      // Actualizar avatar con iniciales
+      const iniciales = obtenerIniciales(nombreUsuario);
+      document.getElementById('user-avatar').textContent = iniciales;
+    }
+
+    // Función para cambiar de sección
+    function changeSection(sectionId) {
+      // Ocultar todas las secciones
+      Object.values(sections).forEach(section => {
+        section.style.display = 'none';
+      });
+      
+      // Mostrar la sección seleccionada
+      if (sections[sectionId]) {
+        sections[sectionId].style.display = 'flex';
+        
+        // Cargar usuarios si es necesario
+        if (sectionId === 'usuarios-section' && !usuariosCargados) {
+          cargarUsuarios();
+        }
+      }
+      
+      // Actualizar el título
+      const titleElement = document.querySelector('.section-title');
+      if (sectionId === 'map-section') {
+        titleElement.textContent = 'Panel de Seguimiento';
+      } else if (sectionId === 'usuarios-section') {
+        titleElement.textContent = 'Usuarios Registrados';
+      }
+      
+      // Actualizar navegación activa
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('data-section') === sectionId) {
+          link.classList.add('active');
+        }
+      });
+    }
+
+    // Iniciar mapa
+    function iniciarMapa() {
+      const ubicacionInicial = { lat: -0.1807, lng: -78.4678 }; // Quito, Ecuador
+
+      mapa = new google.maps.Map(document.getElementById("map"), {
+        center: ubicacionInicial,
+        zoom: 17,
+        mapTypeId: 'roadmap',
+        styles: [
+          {
+            "featureType": "poi",
+            "stylers": [{ "visibility": "off" }]
+          },
+          {
+            "featureType": "transit",
+            "stylers": [{ "visibility": "off" }]
+          },
+          {
+            "featureType": "road",
+            "elementType": "labels",
+            "stylers": [{ "visibility": "simplified" }]
+          }
+        ],
+        disableDefaultUI: true,
+        zoomControl: true
+      });
+
+      // Controles para cambiar el tipo de mapa
+      document.getElementById('satelliteBtn').addEventListener('click', () => {
+        mapa.setMapTypeId('hybrid');
+      });
+
+      document.getElementById('mapBtn').addEventListener('click', () => {
+        mapa.setMapTypeId('roadmap');
+      });
+
+      // Botón para centrar mapa
+      document.getElementById('center-map').addEventListener('click', () => {
+        if (currentLocation) {
+          mapa.panTo(currentLocation);
+        }
+      });
+
+      // Crear marcador
+      marcador = new google.maps.Marker({
+        position: ubicacionInicial,
+        map: mapa,
+        title: "Ubicación actual",
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: '#EA4335',
+          fillOpacity: 1,
+          strokeColor: '#FFFFFF',
+          strokeWeight: 2,
+          scale: 10
+        },
+        animation: google.maps.Animation.DROP
+      });
+
+      // Escuchar cambios en la ubicación en Firebase
+      ubicacionRef.on("value", (snapshot) => {
+        const datos = snapshot.val();
+        if (!datos || !datos.latitud || !datos.longitud) return;
+
+        currentLocation = {
+          lat: datos.latitud,
+          lng: datos.longitud
+        };
+
+        // Mostrar estado de actualización
+        statusBar.style.display = 'flex';
+        setTimeout(() => {
+          statusBar.style.display = 'none';
+        }, 2000);
+
+        marcador.setPosition(currentLocation);
+        mapa.panTo(currentLocation);
+        
+        // Pequeña animación al actualizar
+        marcador.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(() => {
+          marcador.setAnimation(null);
+        }, 1500);
+      });
+    }
+
+    // Cargar usuarios con paginación
+    function cargarUsuarios() {
+      usuariosRef.once("value")
+        .then(snapshot => {
+          const usuarios = snapshot.val();
+          const contenedor = document.getElementById("usuarios-grid");
+          contenedor.innerHTML = "";
+
+          if (!usuarios) {
+            contenedor.innerHTML = `
+              <div class="empty-state">
+                <i class="fas fa-user-slash"></i>
+                <h3>No hay usuarios registrados</h3>
+                <p>Actualmente no hay usuarios en la base de datos.</p>
+              </div>
+            `;
+            return;
+          }
+
+          // Convertir objeto de usuarios a array
+          todosUsuarios = Object.entries(usuarios).map(([uid, datos]) => ({ uid, ...datos }));
+          
+          // Calcular total de páginas
+          totalPaginas = Math.ceil(todosUsuarios.length / usuariosPorPagina);
+          
+          // Crear paginación
+          crearPaginacion();
+          
+          // Mostrar primera página
+          mostrarPagina(1);
+          
+          usuariosCargados = true;
+        })
+        .catch(error => {
+          const errorElement = document.getElementById("error");
+          errorElement.textContent = "Error al obtener usuarios: " + error.message;
+          errorElement.style.display = "block";
+        });
+    }
+
+    // Crear tarjeta de usuario
+    function crearTarjetaUsuario(usuario) {
+      const card = document.createElement("div");
+      card.className = "usuario-card fade-in";
+
+      card.innerHTML = `
+        <p><strong>Nombre:</strong> <span>${usuario.nombre || "No especificado"}</span></p>
+        <p><strong>Apellido:</strong> <span>${usuario.apellido || "No especificado"}</span></p>
+        <p><strong>Cédula:</strong> <span>${usuario.cedula || "No especificada"}</span></p>
+        <p><strong>Dirección:</strong> <span>${usuario.direccion || "No especificada"}</span></p>
+        <p><strong>Teléfono Emergencia:</strong> <span>${usuario.telefonoEmergencia || "No especificado"}</span></p>
+        <p><strong>Tipo:</strong> <span>${usuario.tipo || "No especificado"}</span></p>
+      `;
+
+      return card;
+    }
+
+    // Crear paginación
+    function crearPaginacion() {
+      const paginacion = document.getElementById("pagination");
+      paginacion.innerHTML = "";
+      
+      // Botón anterior
+      const prevBtn = document.createElement("li");
+      prevBtn.className = "page-item";
+      prevBtn.innerHTML = `
+        <a class="page-link ${paginaActual === 1 ? 'disabled' : ''}" href="#" aria-label="Anterior">
+          <i class="fas fa-chevron-left"></i>
+        </a>
+      `;
+      prevBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (paginaActual > 1) {
+          mostrarPagina(paginaActual - 1);
+        }
+      });
+      paginacion.appendChild(prevBtn);
+      
+      // Botones de página
+      const maxBotones = 5; // Máximo número de botones de página a mostrar
+      let inicio = Math.max(1, paginaActual - Math.floor(maxBotones / 2));
+      let fin = Math.min(totalPaginas, inicio + maxBotones - 1);
+      
+      // Ajustar si estamos cerca del final
+      if (fin - inicio + 1 < maxBotones) {
+        inicio = Math.max(1, fin - maxBotones + 1);
+      }
+      
+      // Mostrar el primer botón si no está visible
+      if (inicio > 1) {
+        const firstBtn = document.createElement("li");
+        firstBtn.className = "page-item";
+        firstBtn.innerHTML = `
+          <a class="page-link ${1 === paginaActual ? 'active' : ''}" href="#">1</a>
+        `;
+        firstBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          mostrarPagina(1);
+        });
+        paginacion.appendChild(firstBtn);
+        
+        if (inicio > 2) {
+          const dots = document.createElement("li");
+          dots.className = "page-item disabled";
+          dots.innerHTML = '<span class="page-link">...</span>';
+          paginacion.appendChild(dots);
+        }
+      }
+      
+      // Botones numerados
+      for (let i = inicio; i <= fin; i++) {
+        const pageBtn = document.createElement("li");
+        pageBtn.className = "page-item";
+        pageBtn.innerHTML = `
+          <a class="page-link ${i === paginaActual ? 'active' : ''}" href="#">${i}</a>
+        `;
+        pageBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          mostrarPagina(i);
+        });
+        paginacion.appendChild(pageBtn);
+      }
+      
+      // Mostrar el último botón si no está visible
+      if (fin < totalPaginas) {
+        if (fin < totalPaginas - 1) {
+          const dots = document.createElement("li");
+          dots.className = "page-item disabled";
+          dots.innerHTML = '<span class="page-link">...</span>';
+          paginacion.appendChild(dots);
+        }
+        
+        const lastBtn = document.createElement("li");
+        lastBtn.className = "page-item";
+        lastBtn.innerHTML = `
+          <a class="page-link ${totalPaginas === paginaActual ? 'active' : ''}" href="#">${totalPaginas}</a>
+        `;
+        lastBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          mostrarPagina(totalPaginas);
+        });
+        paginacion.appendChild(lastBtn);
+      }
+      
+      // Botón siguiente
+      const nextBtn = document.createElement("li");
+      nextBtn.className = "page-item";
+      nextBtn.innerHTML = `
+        <a class="page-link ${paginaActual === totalPaginas ? 'disabled' : ''}" href="#" aria-label="Siguiente">
+          <i class="fas fa-chevron-right"></i>
+        </a>
+      `;
+      nextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (paginaActual < totalPaginas) {
+          mostrarPagina(paginaActual + 1);
+        }
+      });
+      paginacion.appendChild(nextBtn);
+    }
+
+    // Mostrar página específica
+    function mostrarPagina(numeroPagina) {
+      // Actualizar página actual
+      paginaActual = numeroPagina;
+      
+      // Calcular índices de usuarios a mostrar
+      const inicio = (numeroPagina - 1) * usuariosPorPagina;
+      const fin = inicio + usuariosPorPagina;
+      const usuariosPagina = todosUsuarios.slice(inicio, fin);
+      
+      // Mostrar usuarios
+      const contenedor = document.getElementById("usuarios-grid");
+      contenedor.innerHTML = "";
+      
+      usuariosPagina.forEach(usuario => {
+        const card = crearTarjetaUsuario(usuario);
+        contenedor.appendChild(card);
+      });
+      
+      // Actualizar paginación
+      crearPaginacion();
+    }
+
+    // Función para cerrar sesión
+    function cerrarSesion() {
+      // Aquí iría la lógica para cerrar sesión en Firebase
+      // auth.signOut().then(() => {
+        // Redirigir a la página de inicio de sesión
+        window.location.href = "index.html";
+      // }).catch((error) => {
+      //   console.error("Error al cerrar sesión:", error);
+      // });
+    }
+
+    // Event listeners para navegación
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const sectionId = link.getAttribute('data-section');
+        if (sectionId) {
+          changeSection(sectionId);
+        }
+      });
+    });
+
+    // Event listener para cerrar sesión
+    document.getElementById('logoutBtn').addEventListener('click', cerrarSesion);
+
+    // Inicializar la aplicación
+    window.addEventListener('load', () => {
+      // Actualizar información del usuario
+      actualizarInfoUsuario();
+      
+      // Iniciar con la sección de mapa
+      changeSection('map-section');
+      
+      // Iniciar el mapa cuando la API de Google Maps esté cargada
+      if (typeof google !== 'undefined') {
+        iniciarMapa();
+      } else {
+        // Si no está cargada, intentar de nuevo después de un tiempo
+        setTimeout(iniciarMapa, 500);
+      }
+    });
+  </script>
+</body>
+</html>

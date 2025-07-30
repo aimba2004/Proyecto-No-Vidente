@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VisioGuide - Sistema de Asistencia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #ff6b6b;
+      --accent: #4cc9f0;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --success: #52b788;
+      --error: #e5383b;
+      --border-radius: 12px;
+      --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .logo-icon {
+      font-size: 2.5rem;
+      color: var(--accent);
+    }
+
+    h1 {
+      color: white;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .tagline {
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    @media (max-width: 900px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .login-section {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .section-title {
+      color: var(--dark);
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      position: relative;
+      padding-bottom: 10px;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    label i {
+      color: var(--primary);
+    }
+
+    .input-with-icon {
+      position: relative;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px 15px 15px 45px;
+      border: 2px solid #e9ecef;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+      font-size: 1.2rem;
+    }
+
+    .password-container {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--gray);
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    .buttons-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 15px;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .login-btn {
+      background: var(--primary);
+      color: white;
+    }
+
+    .login-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .register-btn {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+
+    .register-btn:hover {
+      background: #f0f5ff;
+      transform: translateY(-2px);
+    }
+
+    #mensaje {
+      min-height: 24px;
+      padding: 10px;
+      border-radius: var(--border-radius);
+      text-align: center;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .error {
+      background: rgba(229, 56, 59, 0.1);
+      color: var(--error);
+      border: 1px solid rgba(229, 56, 59, 0.2);
+    }
+
+    .success {
+      background: rgba(82, 183, 136, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(82, 183, 136, 0.2);
+    }
+
+    .info-section {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+
+    .feature-card {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      text-align: center;
+      transition: var(--transition);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      color: var(--accent);
+    }
+
+    .feature-title {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+    }
+
+    .feature-desc {
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    .accessibility-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 30px;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: var(--border-radius);
+    }
+
+    .accessibility-title {
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .accessibility-options {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .access-btn {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+
+    .access-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    footer {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      padding: 20px;
+      font-size: 0.9rem;
+    }
+
+    .high-contrast {
+      --primary: #000000;
+      --primary-dark: #000000;
+      --secondary: #ffff00;
+      --accent: #00ffff;
+      --light: #ffffff;
+      --dark: #000000;
+      background: #ffffff;
+      color: #000000 !important;
+    }
+
+    .high-contrast .login-section,
+    .high-contrast .info-section {
+      background: #ffffff;
+      color: #000000 !important;
+      border: 2px solid #000000;
+    }
+
+    .high-contrast .feature-card {
+      background: #ffffff;
+      color: #000000 !important;
+      border: 2px solid #000000;
+    }
+
+    .high-contrast .accessibility-section {
+      background: #ffffff;
+      color: #000000 !important;
+      border: 2px solid #000000;
+    }
+
+    .high-contrast .access-btn {
+      background: #ffffff;
+      color: #000000 !important;
+      border: 2px solid #000000;
+    }
+
+    .high-contrast .section-title {
+      color: #000000;
+    }
+
+    .high-contrast label {
+      color: #000000;
+    }
+
+    .high-contrast h1, 
+    .high-contrast .tagline,
+    .high-contrast .feature-title,
+    .high-contrast .feature-desc {
+      color: #000000 !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <div class="logo">
+        <i class="fas fa-eye-slash logo-icon"></i>
+        <div>
+          <h1>VisioGuide</h1>
+          <p class="tagline">Sistema de asistencia y seguridad para personas con discapacidad visual</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <section class="login-section">
+        <h2 class="section-title">Iniciar Sesión</h2>
+        
+        <div class="form-group">
+          <label for="email"><i class="fas fa-envelope"></i> Correo electrónico</label>
+          <div class="input-with-icon">
+            <i class="fas fa-envelope input-icon"></i>
+            <input type="email" id="email" placeholder="usuario@ejemplo.com" autocomplete="email">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="password"><i class="fas fa-lock"></i> Contraseña</label>
+          <div class="password-container">
+            <div class="input-with-icon">
+              <i class="fas fa-lock input-icon"></i>
+              <input type="password" id="password" placeholder="Ingresa tu contraseña" autocomplete="current-password">
+            </div>
+            <button class="toggle-password" id="togglePassword" aria-label="Mostrar contraseña">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div id="mensaje"></div>
+        
+        <div class="buttons-container">
+          <button class="login-btn" onclick="login()">
+            <i class="fas fa-sign-in-alt"></i> Entrar
+          </button>
+          <button class="register-btn" onclick="window.location.href='registro.html'">
+            <i class="fas fa-user-plus"></i> Crear nueva cuenta
+          </button>
+        </div>
+      </section>
+
+      <section class="info-section">
+        <h2 class="section-title">¿Qué ofrece VisioGuide?</h2>
+        <p>Una plataforma integral diseñada para mejorar la seguridad y autonomía de personas con discapacidad visual.</p>
+        
+        <div class="features-grid">
+          <div class="feature-card">
+            <i class="fas fa-map-marked-alt feature-icon"></i>
+            <h3 class="feature-title">Navegación Segura</h3>
+            <p class="feature-desc">Asistencia en tiempo real para movilizarse de manera independiente y segura.</p>
+          </div>
+          
+          <div class="feature-card">
+            <i class="fas fa-bell feature-icon"></i>
+            <h3 class="feature-title">Alertas de Emergencia</h3>
+            <p class="feature-desc">Notificaciones inmediatas a contactos de confianza en situaciones de riesgo.</p>
+          </div>
+          
+          <div class="feature-card">
+            <i class="fas fa-hand-holding-heart feature-icon"></i>
+            <h3 class="feature-title">Asistencia Remota</h3>
+            <p class="feature-desc">Conexión directa con voluntarios para asistencia visual en tiempo real.</p>
+          </div>
+          
+          <div class="feature-card">
+            <i class="fas fa-users feature-icon"></i>
+            <h3 class="feature-title">Comunidad</h3>
+            <p class="feature-desc">Red de apoyo entre usuarios y voluntarios comprometidos con la inclusión.</p>
+          </div>
+        </div>
+        
+        <div class="accessibility-section">
+          <h3 class="accessibility-title"><i class="fas fa-universal-access"></i> Opciones de Accesibilidad</h3>
+          <div class="accessibility-options">
+            <button class="access-btn" onclick="toggleContrast()">
+              <i class="fas fa-adjust"></i> Alto Contraste
+            </button>
+            <button class="access-btn" onclick="increaseFontSize()">
+              <i class="fas fa-text-height"></i> Aumentar Texto
+            </button>
+            <button class="access-btn" onclick="decreaseFontSize()">
+              <i class="fas fa-text-width"></i> Reducir Texto
+            </button>
+            <button class="access-btn" onclick="speakPage()">
+              <i class="fas fa-volume-up"></i> Leer Página
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <p>VisioGuide &copy; 2023 - Todos los derechos reservados</p>
+      <p>Diseñado con accesibilidad y seguridad como prioridad</p>
+    </footer>
+  </div>
+
+  <script>
+    // Configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDHLdHbKhbvSg-ET9BKgPnKqqX0IagShac",
+      authDomain: "proyectonovidente-d1e58.firebaseapp.com",
+      databaseURL: "https://proyectonovidente-d1e58-default-rtdb.firebaseio.com",
+      projectId: "proyectonovidente-d1e58",
+      storageBucket: "proyectonovidente-d1e58.appspot.com",
+      messagingSenderId: "1089641196998",
+      appId: "1:1089641196998:web:f95785dec09af8136b56c7",
+      measurementId: "G-PVFZ0EL8VQ"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
+
+    // Función de login
+    function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const mensaje = document.getElementById("mensaje");
+
+      // Validación básica
+      if (!email || !password) {
+        showMessage("Por favor, completa todos los campos.", "error");
+        return;
+      }
+
+      // Validación de formato de email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showMessage("Por favor, ingresa un correo electrónico válido.", "error");
+        return;
+      }
+
+      showMessage("Verificando credenciales...", "success");
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          const uid = userCredential.user.uid;
+
+          database.ref("usuarios/" + uid).once("value")
+            .then(snapshot => {
+              const datos = snapshot.val();
+              const tipo = datos.tipo;
+
+              // ALMACENAR NOMBRE COMPLETO EN LOCALSTORAGE
+              const nombreCompleto = datos.nombre + " " + datos.apellido;
+              localStorage.setItem("nombreUsuario", nombreCompleto);
+
+              if (tipo === "No vidente") {
+                localStorage.setItem("uidNovidente", uid);
+                window.location.href = "novidente.html";
+              } else if (tipo === "Contacto de emergencia") {
+                window.location.href = "mapa.html";
+              } else if (tipo === "Administrador") {
+                window.location.href = "mapa.html";
+              } else {
+                showMessage("Tipo de usuario desconocido.", "error");
+              }
+            })
+            .catch(error => {
+              showMessage("Error al leer datos del usuario: " + error.message, "error");
+            });
+        })
+        .catch(error => {
+          showMessage("Error de inicio de sesión: " + error.message, "error");
+        });
+    }
+
+    // Mostrar mensajes en la interfaz
+    function showMessage(text, type) {
+      const mensaje = document.getElementById("mensaje");
+      mensaje.textContent = text;
+      mensaje.className = type;
+    }
+
+    // Alternar visibilidad de contraseña
+    document.getElementById("togglePassword").addEventListener("click", function() {
+      const passwordInput = document.getElementById("password");
+      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", type);
+      
+      // Cambiar icono
+      this.innerHTML = type === "password" ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+      this.setAttribute("aria-label", type === "password" ? "Mostrar contraseña" : "Ocultar contraseña");
+    });
+
+    // Permitir login con Enter
+    document.getElementById("password").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        login();
+      }
+    });
+
+    // Funciones de accesibilidad
+    function toggleContrast() {
+      document.body.classList.toggle("high-contrast");
+      speak("Modo alto contraste " + (document.body.classList.contains("high-contrast") ? "activado" : "desactivado"));
+    }
+
+    function increaseFontSize() {
+      document.body.style.fontSize = parseFloat(getComputedStyle(document.body).fontSize) * 1.1 + "px";
+      speak("Tamaño de texto aumentado");
+    }
+
+    function decreaseFontSize() {
+      document.body.style.fontSize = parseFloat(getComputedStyle(document.body).fontSize) * 0.9 + "px";
+      speak("Tamaño de texto reducido");
+    }
+
+    function speakPage() {
+      const pageTitle = document.querySelector("h1").textContent;
+      const pageDescription = document.querySelector(".tagline").textContent;
+      const features = document.querySelectorAll(".feature-title");
+      
+      let text = `Bienvenido a ${pageTitle}. ${pageDescription}. `;
+      
+      features.forEach(feature => {
+        text += `${feature.textContent}. `;
+      });
+      
+      speak(text);
+    }
+
+    function speak(text) {
+      if ("speechSynthesis" in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "es-ES";
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        speechSynthesis.speak(utterance);
+      }
+    }
+  </script>
+</body>
+</html>
